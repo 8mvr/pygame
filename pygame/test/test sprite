@@ -1,0 +1,32 @@
+# class SpriteSheet():
+#     def __init__(self, image):
+#         self.sheet = image
+
+#     def idle_image(self, frame, width, heigth, scale, color):
+#         idle = pygame.Surface((width, heigth)).convert_alpha()
+#         idle.blit(self.sheet, (0, 0), ((frame * width), 0, width, heigth))
+#         idle = pygame.transform.scale(idle, (width * scale, heigth * scale))
+#         idle.set_colorkey(color)
+
+#         return idle
+    
+#     def run_image(self, frame, width, heigth, scale, color):
+#         run = pygame.Surface((width, heigth)).convert_alpha()
+#         run.blit(self.sheet, (0, 0), ((frame * width), 0, width, heigth))
+#         run = pygame.transform.scale(run, (width * scale, heigth * scale))
+#         run.set_colorkey(color)
+
+#         return run
+    
+#     def jump_image(self, frame, width, heigth, scale, color):
+#         jump = pygame.Surface((width, heigth)).convert_alpha()
+#         jump.blit(self.sheet, (0, 0), ((frame * width), 0, width, heigth))
+#         jump = pygame.transform.scale(jump, (width * scale, heigth * scale))
+#         jump.set_colorkey(color)
+
+#         return jump
+
+# frame_0 = idle_sheet.idle_image(0, 21, 21, 3, BLACK)
+# frame_1 = idle_sheet.idle_image(1, 21, 21, 3, BLACK)
+# frame_2 = idle_sheet.idle_image(2, 21, 21, 3, BLACK)
+# frame_3 = idle_sheet.idle_image(3, 21, 21, 3, BLACK)

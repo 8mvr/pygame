@@ -1,0 +1,50 @@
+# class player(pygame.sprite.Sprite):
+#     def __init__(self, x, y):
+#         super().__init__()
+#         self.image = pygame.Surface(C_WIDTH, C_HEIGTH)
+#         self.image.fill(BLUE)
+#         self.rect = self.image.get_rect(topleft=(x, y))
+#         self.speed = 5
+
+#         self.velY = 0
+#         self.isJump = False
+#         self.ground = y
+
+#     def update(self, keys):
+#         keys = pygame.key.get_pressed()
+#         if keys[pygame.K_LEFT]:
+#             self.rect.x -= self.speed
+#         if keys[pygame.K_RIGHT]:
+#             self.rect.x += self.speed
+        
+#         if not isJump:
+#             if keys[pygame.K_SPACE]:
+#                 isJump = True
+#                 self.velY = JUMP_HEIGTH
+        
+#         self.velY += GRAVITY
+        
+# players = pygame.sprite.Group()
+
+# player = pygame.image.load('image/heart.png')
+
+
+
+
+
+
+
+# idle_image = pygame.image.load('image/IDLE/male_hero_template-idle.png').convert_alpha()
+# idle_sheet = characterSprite.SpriteSheet(idle_image)
+
+# # run
+# run_image = pygame.image.load('image/RUN/male_hero_template-run.png').convert_alpha()
+# run_sheet = characterSprite.SpriteSheet(run_image)
+
+
+# # jump || fall
+# jump_image = pygame.image.load('image/JUMPING/male_hero_template-jump.png').convert_alpha()
+# jump_sheet = characterSprite.SpriteSheet(jump_image)
+
+# fall_image = pygame.image.load('image/FALL/male_hero_template-fall.png').convert_alpha()
+# fall_sheet = characterSprite.SpriteSheet(fall_image)
