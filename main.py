@@ -1,4 +1,4 @@
-import pygame
+import pygame, os
 from os import listdir
 from os.path import isfile, join
 
