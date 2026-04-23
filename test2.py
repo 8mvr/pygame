@@ -36,7 +36,7 @@ def get_image(sheet, frame, width, height, scale, y_offset):
     return image
 
 # animations: frames, vertical position
-animations = {
+ANIMATIONS = {
     "idle": (10, 128),
     "run": (10, 768),
     "jump": (6, 1280),
@@ -44,19 +44,65 @@ animations = {
     "death": (23, 3072)
 }
 
-# Create animation lists for each action
-anim_lists = {}
-for action_name, (anim_step, y_offset) in animations.items():
-    anim_list = []
-    for x in range(anim_step):
-        anim_list.append(get_image(sprite_sheet_image, x, 128, 128, 1.5, y_offset))
-    anim_lists[action_name] = anim_list
+class Player(pygame.sprite.Sprite):
+    def __init__(self, x, y, sprite_sheet):
+        super().__init__()
+        self.sprite_sheet = sprite_sheet
+        self.x = x
+        self.y = y
+        self.current_action = "idle"
+        self.direction = "right"
+        self.frame = 0
+        self.last_update = pygame.time.get_ticks()
+        self.anim_cooldown = 100  # milliseconds
+        
+        # Create animation lists for each action
+        self.anim_lists = {}
+        for action_name, (anim_step, y_offset) in ANIMATIONS.items():
+            anim_list = []
+            for x in range(anim_step):
+                anim_list.append(get_image(sprite_sheet, x, 128, 128, 1.5, y_offset))
+            self.anim_lists[action_name] = anim_list
+        
+        # Set initial sprite
+        self.image = self.anim_lists[self.current_action][self.frame]
+        self.rect = self.image.get_rect(topleft=(self.x, self.y))
+    
+    def update_animation(self):
+        current_time = pygame.time.get_ticks()
+        if current_time - self.last_update >= self.anim_cooldown:
+            self.frame += 1
+            self.last_update = current_time
+            # reset frame
+            if self.frame >= len(self.anim_lists[self.current_action]):
+                self.frame = 0
+    
+    def set_action(self, action, direction=None):
+        if action != self.current_action:
+            self.current_action = action
+            self.frame = 0
+        if direction:
+            self.direction = direction
+    
+    def update(self):
+        self.update_animation()
+        
+        # Get current frame image
+        current_image = self.anim_lists[self.current_action][self.frame]
+        
+        # Flip the image if facing left
+        if self.direction == "left":
+            current_image = pygame.transform.flip(current_image, True, False)
+            current_image.set_colorkey(BLACK)
+        
+        self.image = current_image
+        self.rect = self.image.get_rect(topleft=(self.x, self.y))
+    
+    def draw(self, surface):
+        surface.blit(self.image, (self.x, self.y))
 
-current_action = "idle"
-last_update = pygame.time.get_ticks()
-anim_cooldown = 100  # millisecond
-frame = 0  # start of the frame
-direction = "right"
+# Create player
+player = Player(0, 0, sprite_sheet_image)
 
 clock = pygame.time.Clock()
 
@@ -69,34 +115,17 @@ while run:
     
     # Change animation and direction based on input
     if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-        current_action = "run"
-        direction = "left"
+        player.set_action("run", "left")
     elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-        current_action = "run"
-        direction = "right"
+        player.set_action("run", "right")
     else:
-        current_action = "idle"
+        player.set_action("idle")
 
-    # Update animation frame
-    current_time = pygame.time.get_ticks()
-    if current_time - last_update >= anim_cooldown:
-        frame += 1
-        last_update = current_time
-        # Reset frame when animation completes
-        if frame >= len(anim_lists[current_action]):
-            frame = 0
+    # Update player
+    player.update()
 
     screen.fill(CUSTOM_1)
-    
-    # Get the current frame image
-    current_image = anim_lists[current_action][frame]
-    
-    # Flip the image if facing left
-    if direction == "left":
-        current_image = pygame.transform.flip(current_image, True, False)
-        current_image.set_colorkey(BLACK)
-    
-    screen.blit(current_image, (0, 0))
+    player.draw(screen)
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
