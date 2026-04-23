@@ -22,7 +22,7 @@ CUSTOM_3 = ("#00550A")
 
 FPS = 60
 
-# image
+# single sprite sheet image
 sprite_sheet_image = pygame.image.load("assets/MainCharacter/male_hero.png").convert_alpha()
 
 def get_image(sheet, frame, width, height, scale, y_offset):
@@ -44,7 +44,7 @@ ANIMATIONS = {
     "fall": (4, 1408),
     "death": (23, 3072)
 }
-
+# ==================== PLAYER ====================
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, sprite_sheet):
         super().__init__()
@@ -118,11 +118,11 @@ class Player(pygame.sprite.Sprite):
     def draw(self, surface):
         surface.blit(self.image, (self.x, self.y))
 
-# Create player
+# ==================== POSITIONS ====================
 player = Player(0, 500, sprite_sheet_image)
-
 clock = pygame.time.Clock()
 
+# ==================== MAIN LOOP ====================
 run = True
 while run:
     clock.tick(FPS)
