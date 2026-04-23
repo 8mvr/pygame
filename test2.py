@@ -28,7 +28,8 @@ sprite_sheet_image = pygame.image.load("assets/MainCharacter/male_hero.png").con
 def get_image(sheet, frame, width, height, scale, y_offset):
     image = pygame.Surface((width, height)).convert_alpha()
 
-    # vertical of the image animation: 128=idle, 768=run, 1280=jump, 1408=fall, 3072=death
+    # vertical of the image animation:
+    # idle = 128 || run = 768 || jump = 1280 || fall = 1408 || death = 3072
     image.blit(sheet, (0, 0), ((frame * width), y_offset, width, height))
     image = pygame.transform.scale(image, (width * scale, height * scale))
     image.set_colorkey(BLACK)
@@ -52,11 +53,17 @@ class Player(pygame.sprite.Sprite):
         self.y = y
         self.current_action = "idle"
         self.direction = "right"
-        self.frame = 0
+        self.frame = 0 # starting animation
+
         self.last_update = pygame.time.get_ticks()
         self.anim_cooldown = 100  # milliseconds
         
-        # Create animation lists for each action
+        # movement
+        self.vel_x = 0
+        self.vel_y = 0
+        self.speed = 5
+        
+        # create animation lists for each action
         self.anim_lists = {}
         for action_name, (anim_step, y_offset) in ANIMATIONS.items():
             anim_list = []
@@ -64,7 +71,7 @@ class Player(pygame.sprite.Sprite):
                 anim_list.append(get_image(sprite_sheet, x, 128, 128, 1.5, y_offset))
             self.anim_lists[action_name] = anim_list
         
-        # Set initial sprite
+        # initial sprite
         self.image = self.anim_lists[self.current_action][self.frame]
         self.rect = self.image.get_rect(topleft=(self.x, self.y))
     
@@ -73,11 +80,12 @@ class Player(pygame.sprite.Sprite):
         if current_time - self.last_update >= self.anim_cooldown:
             self.frame += 1
             self.last_update = current_time
+
             # reset frame
             if self.frame >= len(self.anim_lists[self.current_action]):
-                self.frame = 0
+                self.frame = 0 # reset to 0 for loop animation
     
-    def set_action(self, action, direction=None):
+    def action(self, action, direction=None):
         if action != self.current_action:
             self.current_action = action
             self.frame = 0
@@ -87,10 +95,19 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         self.update_animation()
         
-        # Get current frame image
+        self.x += self.vel_x
+        self.y += self.vel_y
+        
+        # border
+        if self.x < -64:
+            self.x = -64
+        if self.x > SCREEN_WIDTH - 128:
+            self.x = SCREEN_WIDTH - 128
+        
+        # current frame image
         current_image = self.anim_lists[self.current_action][self.frame]
         
-        # Flip the image if facing left
+        # flip the image if facing left
         if self.direction == "left":
             current_image = pygame.transform.flip(current_image, True, False)
             current_image.set_colorkey(BLACK)
@@ -102,7 +119,7 @@ class Player(pygame.sprite.Sprite):
         surface.blit(self.image, (self.x, self.y))
 
 # Create player
-player = Player(0, 0, sprite_sheet_image)
+player = Player(0, 500, sprite_sheet_image)
 
 clock = pygame.time.Clock()
 
@@ -110,26 +127,29 @@ run = True
 while run:
     clock.tick(FPS)
 
-    # Get keyboard input
-    keys = pygame.key.get_pressed()
-    
-    # Change animation and direction based on input
-    if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-        player.set_action("run", "left")
-    elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-        player.set_action("run", "right")
-    else:
-        player.set_action("idle")
-
     # Update player
     player.update()
 
     screen.fill(CUSTOM_1)
+
     player.draw(screen)
-    
+        
+    keys = pygame.key.get_pressed()
+
+    if keys[pygame.K_LEFT]:
+        player.action("run", "left")
+        player.vel_x = -player.speed
+    elif keys[pygame.K_RIGHT]:
+        player.action("run", "right")
+        player.vel_x = player.speed
+    else:
+        player.action("idle")
+        player.vel_x = 0
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
+        
 
     pygame.display.flip()
 
