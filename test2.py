@@ -22,12 +22,17 @@ CUSTOM_3 = ("#00550A")
 
 FPS = 60
 
+# Physics
 GRAVITY = 0.5
 JUMP_STRENGTH = -10
 GROUND_LEVEL = SCREEN_HEIGHT - 80
 
-# single sprite sheet image
+# character sprite
 sprite_sheet_image = pygame.image.load("assets/MainCharacter/male_hero.png").convert_alpha()
+
+# bg
+bg_image = pygame.image.load("assets/Background/menu_bg.jpg").convert_alpha()
+bg_image = pygame.transform.scale(bg_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 def get_image(sheet, frame, width, height, scale, y_offset):
     image = pygame.Surface((width, height)).convert_alpha()
@@ -172,7 +177,7 @@ while run:
     # Update player
     player.update()
 
-    screen.fill(CUSTOM_1)
+    screen.blit(bg_image, (0, 0))
 
     player.draw(screen)
         
