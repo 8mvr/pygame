@@ -22,6 +22,11 @@ CUSTOM_3 = ("#00550A")
 
 FPS = 60
 
+# Physics
+GRAVITY = 0.5
+JUMP_STRENGTH = -10
+GROUND_LEVEL = SCREEN_HEIGHT - 80
+
 # single sprite sheet image
 sprite_sheet_image = pygame.image.load("assets/MainCharacter/male_hero.png").convert_alpha()
 
@@ -63,6 +68,11 @@ class Player(pygame.sprite.Sprite):
         self.vel_y = 0
         self.speed = 5
         
+        # jump and gravity
+        self.is_jumping = False
+        self.is_falling = False
+        self.on_ground = True
+        
         # create animation lists for each action
         self.anim_lists = {}
         for action_name, (anim_step, y_offset) in ANIMATIONS.items():
@@ -86,24 +96,57 @@ class Player(pygame.sprite.Sprite):
                 self.frame = 0 # reset to 0 for loop animation
     
     def action(self, action, direction=None):
+        # when jump only jump & fall anim
+        if self.is_jumping or self.is_falling:
+            return
+        
         if action != self.current_action:
             self.current_action = action
             self.frame = 0
         if direction:
             self.direction = direction
     
+    def jump(self):
+        if self.on_ground:
+            self.vel_y = JUMP_STRENGTH
+            self.is_jumping = True
+            self.is_falling = False
+            self.on_ground = False
+            self.current_action = "jump"
+            self.frame = 0
+    
     def update(self):
         self.update_animation()
+        
+        # gravity
+        self.vel_y += GRAVITY
         
         self.x += self.vel_x
         self.y += self.vel_y
         
-        # border
+        # boders
         if self.x < -64:
             self.x = -64
         if self.x > SCREEN_WIDTH - 128:
             self.x = SCREEN_WIDTH - 128
-        
+
+        if self.y >= GROUND_LEVEL:
+            self.y = GROUND_LEVEL
+            self.vel_y = 0
+            self.on_ground = True
+            self.is_jumping = False
+            
+            if self.is_falling:
+                self.is_falling = False
+        else:
+            self.on_ground = False
+            
+            if self.vel_y > 0 and self.is_jumping:
+                self.is_jumping = False
+                self.is_falling = True
+                self.current_action = "fall"
+                self.frame = 0
+     
         # current frame image
         current_image = self.anim_lists[self.current_action][self.frame]
         
@@ -143,8 +186,13 @@ while run:
         player.action("run", "right")
         player.vel_x = player.speed
     else:
-        player.action("idle")
+        if player.on_ground:
+            player.action("idle")
         player.vel_x = 0
+    
+    # Jump
+    if keys[pygame.K_SPACE]:
+        player.jump()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
